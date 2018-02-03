@@ -39,6 +39,15 @@ services:
     ports:
       - 5432:5432                 # Postgres port
 
+  # This configuration allows you to start MS SQL DB
+  mssql:
+    image: microsoft/mssql-server-linux:latest
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: P4sw0rd123
+    ports:
+      - 1433:1433                 # MSSQL port
+
   zoonavigator-web:
     image: elkozmon/zoonavigator-web:latest
     container_name: zoonavigator-web
