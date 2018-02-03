@@ -48,6 +48,15 @@ services:
     ports:
       - 1433:1433                 # MSSQL port
 
+  # This configuration allows you to start My SQL DB
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql  # password for user root
+    ports:
+      - 3306:3306
+
   zoonavigator-web:
     image: elkozmon/zoonavigator-web:latest
     container_name: zoonavigator-web
