@@ -1,0 +1,60 @@
+version: '2'
+
+services:
+  # this is our kafka cluster.
+  kafka-cluster:
+    image: landoop/fast-data-dev:latest
+    environment:
+      ADV_HOST: 127.0.0.1
+      RUNTESTS: 0                 # Disable Running tests so the cluster starts faster
+    ports:
+      - 2181:2181                 # Zookeeper
+      - 3030:3030                 # Landoop UI
+      - 8081-8083:8081-8083       # REST Proxy, Schema Registry, Kafka Connect ports
+      - 9581-9585:9581-9585       # JMX Ports
+      - 9092:9092                 # Kafka Broker
+
+  # This configuration allows you to start Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.1.1
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  # This configuration allows you to start Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.1.1
+    ports:
+      - 5601:5601
+
+  # This configuration allows you to start postgres
+  postgres:
+    image: postgres:9.5-alpine
+    environment:
+      POSTGRES_USER: postgres     # define credentials
+      POSTGRES_PASSWORD: postgres # define credentials
+      POSTGRES_DB: postgres       # define database
+    ports:
+      - 5432:5432                 # Postgres port
+
+  zoonavigator-web:
+    image: elkozmon/zoonavigator-web:latest
+    container_name: zoonavigator-web
+    environment:
+      API_HOST: "zoonavigator-api"
+      API_PORT: 9001
+      SERVER_HTTP_PORT: 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+     - zoonavigator-api
+    restart: always
+
+  zoonavigator-api:
+    image: elkozmon/zoonavigator-api:latest
+    container_name: zoonavigator-api
+    environment:
+      SERVER_HTTP_PORT: 9001
+    restart: always
