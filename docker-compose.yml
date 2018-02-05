@@ -14,7 +14,7 @@ services:
       - 9581-9585:9581-9585       # JMX Ports
       - 9092:9092                 # Kafka Broker
     volumes:
-      - ./kafka-connect-jdbc:/usr/share/java/kafka-connect-jdbc
+      - ./kafka-connect-jdbc:/usr/share/java/kafka-connect-jdbc # bind mount for Kafka additional JDBC drivers
 
   # This configuration allows you to start Elasticsearch
   elasticsearch:
@@ -70,7 +70,52 @@ services:
     depends_on:
         - postgres
     volumes:
-        - ./dags:/usr/local/airflow/dags
+        - ./dags:/usr/local/airflow/dags # bind mount for airflow dags
     ports:
         - 8080:8080               # airflow port
     command: webserver
+
+  # This configuration allows you to start Hadoop name node
+  namenode:
+    image: uhopper/hadoop-namenode
+    environment:
+      - CLUSTER_NAME=hadoop_dev
+    ports:
+      - 8020:8020
+
+  # This configuration allows you to start Hadoop data node
+  datanode1:
+    image: uhopper/hadoop-datanode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+
+  # This configuration allows you to start YARN resource manager
+  resourcemanager:
+    image: uhopper/hadoop-resourcemanager
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - YARN_CONF_yarn_log___aggregation___enable=true
+    ports:
+      - 8088:8088
+
+  # This configuration allows you to start YARN node manager
+  nodemanager1:
+    image: uhopper/hadoop-nodemanager
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
+      - YARN_CONF_yarn_log___aggregation___enable=true
+      - YARN_CONF_yarn_nodemanager_remote___app___log___dir=/app-logs
+
+  # This configuration allows you to start Hadoop edge node with Spark
+  spark:
+    image: uhopper/hadoop-spark
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
+    command: tail -f /var/log/dmesg
+    ports:
+      - 18080:18080
+      - 4040:4040
+    volumes:
+      - ./spark-jobs:/opt/transformations     # bind mount for Spark jar jobs

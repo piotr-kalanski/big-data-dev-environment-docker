@@ -1,5 +1,5 @@
 # big-data-dev-environment-docker
-Big Data Development environment based on Docker.
+Big Data development environment based on Docker.
 
 ![](images/environment_diagram.png)
 

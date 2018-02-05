@@ -1,0 +1,1 @@
+Put your Spark applications jars in this folder, they will be available at spark container in directory `/opt/transformations`.
