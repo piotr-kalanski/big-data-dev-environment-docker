@@ -10,4 +10,4 @@ Start Docker container with local S3:
 
 ## Run example
 
-Run main from class [S3LocalJavaExample](/src/main/java/com/datawizards/s3/S3LocalJavaExample.java).
+Run main from class [S3LocalJavaExample](./src/main/java/com/datawizards/s3/S3LocalJavaExample.java).
