@@ -1,6 +1,6 @@
 # S3 example with Java AWS SDK API
 
-Example how to integrate with fake S3 using Java AWS SDK API.
+Example how to integrate Java AWS SDK API with fake S3.
 
 ## Prerequisites
 

@@ -26,3 +26,9 @@ Spark applications can be copied to directory [spark-jobs](/spark-jobs), so that
 ## Kafka Connect JDBC drivers
 
 If you want to add new JDBC drivers to Kafka Connect you can copy them locally to directory [kafka-connect-jdbc](/kafka-connect-jdbc).
+
+# Examples
+
+- [How to connect to local S3 with S3 browser](/examples/example-s3-browser)
+- [How to integrate Java AWS SDK API with fake S3](/examples/example-java-s3-local)
+- [How to integrate Spark with local Hadoop](/examples/example-spark-hdfs)
