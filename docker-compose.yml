@@ -78,16 +78,26 @@ services:
   # This configuration allows you to start Hadoop name node
   namenode:
     image: uhopper/hadoop-namenode
+    container_name: namenode
     environment:
       - CLUSTER_NAME=hadoop_dev
+      - HDFS_CONF_dfs_replication=1 # change replication to 1, because only 1 data node
+      - HDFS_CONF_dfs_permissions_enabled=false # permission checking is turned off
     ports:
       - 8020:8020
+      - 50070:50070
 
   # This configuration allows you to start Hadoop data node
   datanode1:
     image: uhopper/hadoop-datanode
+    container_name: datanode1
+    hostname: datanode1
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    ports:
+      - 50010:50010
+      - 50020:50020
+      - 50075:50075
 
   # This configuration allows you to start YARN resource manager
   resourcemanager:
@@ -110,6 +120,7 @@ services:
   # This configuration allows you to start Hadoop edge node with Spark
   spark:
     image: uhopper/hadoop-spark
+    container_name: spark
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
       - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
