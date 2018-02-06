@@ -136,3 +136,9 @@ services:
     image: lphoward/fake-s3
     ports:
       - 4569:4569
+
+  dynamodb:
+    image: cnadiminti/dynamodb-local
+    container_name: dynamodb
+    ports:
+      - 8000:8000
