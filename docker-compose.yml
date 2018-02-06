@@ -119,3 +119,9 @@ services:
       - 4040:4040
     volumes:
       - ./spark-jobs:/opt/transformations     # bind mount for Spark jar jobs
+
+  # This configuration allows you to start local S3 based on fakes3 (https://github.com/jubos/fake-s3)
+  s3:
+    image: lphoward/fake-s3
+    ports:
+      - 4569:4569
