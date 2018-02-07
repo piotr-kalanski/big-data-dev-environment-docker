@@ -34,3 +34,4 @@ If you want to add new JDBC drivers to Kafka Connect you can copy them locally t
 - [How to integrate Spark with local Hadoop](/examples/example-spark-hdfs)
 - [How to connect from AWS CLI to local Dynamo DB](/examples/example-dynamodb-with-awscli)
 - [How to integrate Java AWS SDK API with local Dynamo DB](/examples/example-java-dynamodb-local)
+- [How to work with Spark together with internal Hive](/examples/example-spark-plus-internal-hive)
