@@ -1,9 +1,10 @@
-version: '2'
+version: '2.1'
 
 services:
   # this is our kafka cluster.
   kafka-cluster:
     image: landoop/fast-data-dev:latest
+    container_name: kafka
     environment:
       ADV_HOST: 127.0.0.1
       RUNTESTS: 0                 # Disable Running tests so the cluster starts faster
@@ -19,6 +20,7 @@ services:
   # This configuration allows you to start Elasticsearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.1.1
+    container_name: elasticsearch
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
@@ -28,6 +30,7 @@ services:
   # This configuration allows you to start Kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:6.1.1
+    container_name: kibana
     ports:
       - 5601:5601
     depends_on:
@@ -35,7 +38,8 @@ services:
 
   # This configuration allows you to start Postgres
   postgres:
-    image: postgres:9.5-alpine
+    image: postgres:9.6
+    container_name: postgres
     environment:
       POSTGRES_USER: postgres     # define credentials
       POSTGRES_PASSWORD: postgres # define credentials
@@ -57,23 +61,81 @@ services:
   # This configuration allows you to start My SQL DB
   mysql:
     image: mysql
+    container_name: mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: mysql  # password for user root
     ports:
       - 3306:3306
 
-  # This configuration allows you to start airflow
-  airflow:
-    image: puckel/docker-airflow:latest
+  # This configuration allows you to start Redis DB
+  redis:
+    image: 'redis:3.2.7'
+    container_name: redis
+
+  # This configuration allows you to start airflow webserver
+  webserver:
+    image: puckel/docker-airflow:1.9.0
     restart: always
     depends_on:
         - postgres
+        - redis
+    environment:
+        - LOAD_EX=n
+        - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+        - EXECUTOR=Celery
     volumes:
-        - ./dags:/usr/local/airflow/dags # bind mount for airflow dags
+        - ./airflow_dags:/usr/local/airflow/dags
+        - ./airflow_plugins:/usr/local/airflow/plugins
     ports:
-        - 8080:8080               # airflow port
-    command: webserver
+        - "8080:8080"
+    command: airflow_webserver
+    healthcheck:
+        test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+        interval: 30s
+        timeout: 30s
+        retries: 3
+
+  # This configuration allows you to start airflow flower for Celery mode
+  flower:
+    image: puckel/docker-airflow:1.9.0
+    restart: always
+    depends_on:
+        - redis
+    environment:
+        - EXECUTOR=Celery
+    ports:
+        - "5555:5555"
+    command: flower
+
+  # This configuration allows you to start airflow scheduler
+  scheduler:
+    image: puckel/docker-airflow:1.9.0
+    restart: always
+    depends_on:
+        - webserver
+    volumes:
+        - ./airflow_dags:/usr/local/airflow/dags
+        - ./airflow_plugins:/usr/local/airflow/plugins
+    environment:
+        - LOAD_EX=n
+        - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+        - EXECUTOR=Celery
+    command: scheduler
+
+  # This configuration allows you to start airflow worker
+  worker:
+    image: puckel/docker-airflow:1.9.0
+    restart: always
+    depends_on:
+        - scheduler
+    volumes:
+        - ./airflow_dags:/usr/local/airflow/dags
+        - ./airflow_plugins:/usr/local/airflow/plugins
+    environment:
+        - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+        - EXECUTOR=Celery
+    command: worker
 
   # This configuration allows you to start Hadoop name node
   namenode:

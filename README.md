@@ -17,7 +17,11 @@ You can run selected services by specifying names in the end, for example to run
 
 ## Airflow dags
 
-Airflow dags can be copied on host to directory [dags](/dags), so that they will be visible inside Docker container with airflow. 
+Airflow dags can be copied on host to directory [airflow_dags](/airflow_dags), so that they will be visible inside Docker container with airflow. 
+
+## Airflow plugins
+
+Airflow plugins can be copied on host to directory [airflow_plugins](/airflow_plugins), so that they will be visible inside Docker container with airflow. 
 
 ## Spark applications
 
