@@ -15,6 +15,7 @@ public class DynamoDBLocalJavaExample {
     private static final String TEST_TABLE = "test_table";
 
     private final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
+            // important to eetup endpoint for local Dynamo DB:
             new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "us-west-2"))
             .build();
 
